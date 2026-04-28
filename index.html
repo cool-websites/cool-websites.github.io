@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Zachary — Dev & Creator</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #080b10;
+    --surface: #0d1117;
+    --border: #1e2a38;
+    --accent: #00f0ff;
+    --accent2: #7c3aed;
+    --accent3: #f59e0b;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --card: #0f1923;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* ── GRID LINES ── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,240,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,240,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── GLOW ORBS ── */
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .orb1 { width: 500px; height: 500px; background: rgba(0,240,255,0.07); top: -100px; left: -100px; }
+  .orb2 { width: 400px; height: 400px; background: rgba(124,58,237,0.09); bottom: 100px; right: -80px; }
+  .orb3 { width: 300px; height: 300px; background: rgba(245,158,11,0.05); top: 50%; left: 50%; transform: translate(-50%,-50%); }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.2rem 4rem;
+    background: rgba(8,11,16,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .nav-links { display: flex; gap: 2rem; }
+  .nav-links a {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* ── SECTIONS ── */
+  section { position: relative; z-index: 1; }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 4rem;
+    padding-top: 6rem;
+  }
+
+  .hero-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .hero-tag::before {
+    content: '';
+    display: inline-block;
+    width: 32px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .hero h1 {
+    font-size: clamp(3.5rem, 9vw, 8rem);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero h1 .line1 { display: block; color: var(--text); }
+  .hero h1 .line2 {
+    display: block;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-desc {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.8;
+    max-width: 520px;
+    margin-bottom: 3rem;
+  }
+
+  .hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+  .btn-primary {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--bg);
+    background: var(--accent);
+    border: none;
+    padding: 0.9rem 2rem;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: box-shadow 0.2s, transform 0.15s;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  }
+  .btn-primary:hover {
+    box-shadow: 0 0 30px rgba(0,240,255,0.4);
+    transform: translateY(-2px);
+  }
+
+  .btn-ghost {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: transparent;
+    border: 1px solid var(--accent);
+    padding: 0.9rem 2rem;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.2s, color 0.2s;
+  }
+  .btn-ghost:hover {
+    background: rgba(0,240,255,0.08);
+  }
+
+  .hero-stats {
+    margin-top: 5rem;
+    display: flex;
+    gap: 4rem;
+    border-top: 1px solid var(--border);
+    padding-top: 2.5rem;
+  }
+  .stat-num {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .stat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 0.4rem;
+  }
+
+  /* ── ABOUT ── */
+  .about {
+    padding: 8rem 4rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .section-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent2);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .section-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 24px;
+    height: 1px;
+    background: var(--accent2);
+  }
+
+  .section-title {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+  }
+
+  .about-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 2;
+  }
+  .about-text p + p { margin-top: 1.2rem; }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .skill-chip {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 1rem 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: border-color 0.2s, transform 0.15s;
+    cursor: default;
+  }
+  .skill-chip:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+  .skill-icon { font-size: 1.3rem; }
+  .skill-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    color: var(--text);
+    text-transform: uppercase;
+  }
+
+  /* ── PROJECTS ── */
+  .projects {
+    padding: 6rem 4rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .projects-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 3.5rem;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .project-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+    position: relative;
+  }
+  .project-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-4px);
+  }
+  .project-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0,240,255,0.03), transparent 60%);
+    pointer-events: none;
+  }
+
+  .project-preview {
+    height: 180px;
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .project-preview iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    transform-origin: top left;
+    transform: scale(0.5);
+    width: 200%;
+    height: 200%;
+    pointer-events: none;
+  }
+
+  .project-preview-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--surface), var(--card));
+    position: relative;
+    overflow: hidden;
+  }
+  .project-preview-placeholder::before {
+    content: '';
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,240,255,0.15);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .project-preview-placeholder::after {
+    content: '';
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,240,255,0.1);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .preview-icon { font-size: 2.5rem; z-index: 1; }
+
+  .project-body { padding: 1.5rem; }
+
+  .project-tags {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.9rem;
+    flex-wrap: wrap;
+  }
+  .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid;
+    border-radius: 0;
+  }
+  .tag-cyan  { color: var(--accent);  border-color: rgba(0,240,255,0.35);  background: rgba(0,240,255,0.06); }
+  .tag-purple{ color: #a78bfa;        border-color: rgba(167,139,250,0.35); background: rgba(167,139,250,0.06); }
+  .tag-amber { color: var(--accent3); border-color: rgba(245,158,11,0.35);  background: rgba(245,158,11,0.06); }
+  .tag-green { color: #4ade80;        border-color: rgba(74,222,128,0.35);  background: rgba(74,222,128,0.06); }
+
+  .project-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+    letter-spacing: -0.01em;
+  }
+
+  .project-desc {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 1.4rem;
+  }
+
+  .project-link {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 1px solid rgba(0,240,255,0.3);
+    padding-bottom: 2px;
+    transition: gap 0.2s;
+  }
+  .project-link:hover { gap: 0.8rem; }
+
+  /* ── CONTACT ── */
+  .contact {
+    padding: 8rem 4rem;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .contact .section-title { margin-bottom: 1rem; }
+  .contact-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.8;
+    margin-bottom: 3rem;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .footer-copy {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+  .footer-dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ── CURSOR GLOW ── */
+  .cursor-glow {
+    position: fixed;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,240,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 1;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.3s;
+  }
+
+  /* ── SCANLINE ── */
+  .scanline {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: rgba(0,240,255,0.15);
+    z-index: 9998;
+    animation: scan 8s linear infinite;
+    pointer-events: none;
+  }
+  @keyframes scan {
+    0%   { top: -2px; }
+    100% { top: 100vh; }
+  }
+
+  /* ── ANIMATIONS ── */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .fade-in.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { gap: 1rem; }
+    .hero { padding: 0 1.5rem; padding-top: 6rem; }
+    .hero-stats { gap: 2rem; flex-wrap: wrap; }
+    .about { grid-template-columns: 1fr; gap: 3rem; padding: 5rem 1.5rem; }
+    .projects { padding: 5rem 1.5rem; }
+    .contact { padding: 5rem 1.5rem; }
+    footer { padding: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="scanline"></div>
+<div class="cursor-glow" id="cursorGlow"></div>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">// cool-websites.github.io</div>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#projects">Projects</a>
+    <a href="#contact">Contact</a>
+    <a href="https://cool-websites.github.io" target="_blank">GitHub</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-tag">Available for projects</div>
+  <h1>
+    <span class="line1">I CODE FOR</span>
+    <span class="line2">PEOPLE.</span>
+  </h1>
+  <p class="hero-desc">
+    Independent dev & creator. I build games, websites, bots, and tools — whatever people need, I make it real. Based in Carter Lake, shipping projects that actually work.
+  </p>
+  <div class="hero-ctas">
+    <a href="#projects" class="btn-primary">See My Work →</a>
+    <a href="#contact" class="btn-ghost">Get In Touch</a>
+  </div>
+  <div class="hero-stats">
+    <div>
+      <div class="stat-num">5+</div>
+      <div class="stat-label">Project Types</div>
+    </div>
+    <div>
+      <div class="stat-num">∞</div>
+      <div class="stat-label">Ideas Shipped</div>
+    </div>
+    <div>
+      <div class="stat-num">1</div>
+      <div class="stat-label">Dev. Me.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="fade-in">
+    <div class="section-eyebrow">Who I Am</div>
+    <h2 class="section-title">Dev. Creator.<br/>Builder.</h2>
+    <div class="about-text">
+      <p>I'm Zachary — an independent developer and hobbyist creator who codes for people. Whether it's a Roblox game, a Discord bot, a web tool, or a music brand, I build things that have real purpose and real users.</p>
+      <p>My work spans game dev, web dev, scripting, and creative branding. If you need something built, I figure out how to build it — and make it actually good.</p>
+    </div>
+  </div>
+  <div class="skills-grid fade-in">
+    <div class="skill-chip"><span class="skill-icon">🎮</span><span class="skill-name">Roblox / Lua</span></div>
+    <div class="skill-chip"><span class="skill-icon">🌐</span><span class="skill-name">Web Dev</span></div>
+    <div class="skill-chip"><span class="skill-icon">🤖</span><span class="skill-name">Discord Bots</span></div>
+    <div class="skill-chip"><span class="skill-icon">🐍</span><span class="skill-name">Python</span></div>
+    <div class="skill-chip"><span class="skill-icon">🎵</span><span class="skill-name">Music Branding</span></div>
+    <div class="skill-chip"><span class="skill-icon">🎨</span><span class="skill-name">Graphic Design</span></div>
+    <div class="skill-chip"><span class="skill-icon">🖥️</span><span class="skill-name">HTML / CSS / JS</span></div>
+    <div class="skill-chip"><span class="skill-icon">🛠️</span><span class="skill-name">Tooling & Scripts</span></div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section class="projects" id="projects">
+  <div class="projects-header fade-in">
+    <div>
+      <div class="section-eyebrow">What I've Built</div>
+      <h2 class="section-title">Projects</h2>
+    </div>
+  </div>
+
+  <div class="projects-grid">
+
+    <!-- LvlUp Pro -->
+    <div class="project-card fade-in">
+      <div class="project-preview">
+        <div class="project-preview-placeholder">
+          <span class="preview-icon">🎮</span>
+        </div>
+      </div>
+      <div class="project-body">
+        <div class="project-tags">
+          <span class="tag tag-cyan">Web</span>
+          <span class="tag tag-purple">Games</span>
+          <span class="tag tag-green">HTML</span>
+        </div>
+        <div class="project-title">LvlUp Pro</div>
+        <p class="project-desc">An unblocked gaming portal with 50+ games, XP progression, login/signup with email verification, ghost mode, lofi radio, and a full arcade UI. Single-file, no backend needed.</p>
+        <a href="https://cool-websites.github.io/LVL-up-learning.github.io/" target="_blank" class="project-link">Visit Site →</a>
+      </div>
+    </div>
+
+    <!-- VIBE CHECKER -->
+<div class="project-card fade-in">
+  <div class="project-preview">
+    <div class="project-preview-placeholder">
+      <span class="preview-icon">🔮</span> <!-- change emoji -->
+    </div>
+  </div>
+  <div class="project-body">
+    <div class="project-tags">
+      <span class="tag tag-cyan">Web</span>      
+      <span class="tag tag-purple">HTML</span>
+    </div>
+    <div class="project-title">Vibe checker</div>
+    <p class="project-desc">A sophisticated sentiment analyzer featuring real-time tone detection, emotional intensity scales, custom vibe profiles, minimalist data visualization, and a sleek neon-glass UI. Fully responsive, lightweight, and built for instant feedback without a backend..</p>
+    <a href="http://cool-websites.github.io/Vibe-check.github.io/" target="_blank" class="project-link">Visit Site →</a>
+  </div>
+</div>
+
+    <!-- Crime Empire Tycoon -->
+    <div class="project-card fade-in">
+      <div class="project-preview">
+        <div class="project-preview-placeholder">
+          <span class="preview-icon">🏙️</span>
+        </div>
+      </div>
+      <div class="project-body">
+        <div class="project-tags">
+          <span class="tag tag-amber">Roblox</span>
+          <span class="tag tag-purple">Lua</span>
+          <span class="tag tag-cyan">Game Dev</span>
+        </div>
+        <div class="project-title">Crime Empire Tycoon</div>
+        <p class="project-desc">A feature-rich Roblox tycoon with rebirth tiers, gang mechanics, quests, achievements, game passes, and a full admin web panel. Built entirely from scratch.</p>
+        <a href="https://www.roblox.com/games/95273301370173/Crime-boss-tycoon" target="_blank" class="project-link">Play on Roblox →</a>
+      </div>
+    </div>
+
+    <!-- Obby Admin Panel -->
+    <div class="project-card fade-in">
+      <div class="project-preview">
+        <div class="project-preview-placeholder">
+          <span class="preview-icon">🛡️</span>
+        </div>
+      </div>
+      <div class="project-body">
+        <div class="project-tags">
+          <span class="tag tag-amber">Roblox</span>
+          <span class="tag tag-cyan">Node.js</span>
+          <span class="tag tag-purple">Full-Stack</span>
+        </div>
+        <div class="project-title">Obby Moderation System</div>
+        <p class="project-desc">Full-stack moderation suite: Netlify HTML admin panel, Node.js server on Render, Lua in-game panel with 40+ commands, Discord webhooks, persistent bans, and role-based access.</p>
+        <span class="project-link" style="cursor:default; opacity:0.5">Private Project</span>
+      </div>
+    </div>
+
+    <!-- Songs Guy Brand -->
+    <div class="project-card fade-in">
+      <div class="project-preview">
+        <div class="project-preview-placeholder">
+          <span class="preview-icon">🎵</span>
+        </div>
+      </div>
+      <div class="project-body">
+        <div class="project-tags">
+          <span class="tag tag-amber">Branding</span>
+          <span class="tag tag-green">Design</span>
+          <span class="tag tag-purple">Music</span>
+        </div>
+        <div class="project-title">Songs Guy</div>
+        <p class="project-desc">Full artist brand identity including SVG/PNG vinyl-record logo, lo-fi cover art (3000×3000px), YouTube channel design, and music production work under the "Songs Guy" project.</p>
+        <span class="project-link" style="cursor:default; opacity:0.5">Ongoing Project</span>
+      </div>
+    </div>
+
+    <!-- Discord Bot -->
+    <div class="project-card fade-in">
+      <div class="project-preview">
+        <div class="project-preview-placeholder">
+          <span class="preview-icon">🤖</span>
+        </div>
+      </div>
+      <div class="project-body">
+        <div class="project-tags">
+          <span class="tag tag-cyan">Discord</span>
+          <span class="tag tag-purple">JavaScript</span>
+          <span class="tag tag-green">Bot</span>
+        </div>
+        <div class="project-title">Zach's Utility Guy</div>
+        <p class="project-desc">A moderation and utility Discord bot with a custom 1024×1024px logo. Built for real servers with practical moderation tools, commands, and logging.</p>
+        <span class="project-link" style="cursor:default; opacity:0.5">Private Bot</span>
+      </div>
+    </div>
+
+    <!-- Python Scripts -->
+    <div class="project-card fade-in">
+      <div class="project-preview">
+        <div class="project-preview-placeholder">
+          <span class="preview-icon">🐍</span>
+        </div>
+      </div>
+      <div class="project-body">
+        <div class="project-tags">
+          <span class="tag tag-green">Python</span>
+          <span class="tag tag-cyan">Tooling</span>
+          <span class="tag tag-amber">Scripts</span>
+        </div>
+        <div class="project-title">Python Utilities</div>
+        <p class="project-desc">Custom Python scripts including a smart file organizer, a calculator with natural "x" multiplication support, and viral rant-style monologue generators with humor-driven output.</p>
+        <span class="project-link" style="cursor:default; opacity:0.5">Personal Scripts</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="fade-in">
+    <div class="section-eyebrow" style="justify-content:center;">Let's Build Something</div>
+    <h2 class="section-title">Got an Idea?<br/>I Can Build It.</h2>
+    <p class="contact-sub">
+      Whether it's a game, a website, a bot, or a tool — if you need it built, I code for people. Let's make it happen.
+    </p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+      <a href="https://mail.google.com/mail/?view=cm&to=coolwebsites11@gmail.com" target="_blank" class="btn-primary">Send a Message →</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-copy">© 2026 cool-websites.github.io — I code for people.</div>
+  <div class="footer-dot"></div>
+  <div class="footer-copy" style="font-family:'Space Mono',monospace;font-size:0.65rem;">Carter Lake, NE</div>
+</footer>
+
+<script>
+  // Cursor glow follow
+  const glow = document.getElementById('cursorGlow');
+  document.addEventListener('mousemove', e => {
+    glow.style.left = e.clientX + 'px';
+    glow.style.top  = e.clientY + 'px';
+  });
+
+  // Scroll fade-in observer
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
